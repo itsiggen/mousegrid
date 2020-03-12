@@ -1,5 +1,6 @@
 import gym
-import gym_minigrid
+import minigrid
+import mouseplane
 
 
 def make_env(env_key, seed=None):

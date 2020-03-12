@@ -7,7 +7,7 @@ import tensorboardX
 import sys
 
 import utils
-from model import MouseModel
+from model import ACModel
 
 
 # Parse arguments
@@ -27,8 +27,8 @@ parser.add_argument("--log-interval", type=int, default=1,
                     help="number of updates between two logs (default: 1)")
 parser.add_argument("--save-interval", type=int, default=10,
                     help="number of updates between two saves (default: 10, 0 means no saving)")
-parser.add_argument("--procs", type=int, default=1,
-                    help="number of processes (default: 1)")
+parser.add_argument("--procs", type=int, default=16,
+                    help="number of processes (default: 16)")
 parser.add_argument("--frames", type=int, default=10**7,
                     help="number of frames of training (default: 1e7)")
 
@@ -59,8 +59,8 @@ parser.add_argument("--clip-eps", type=float, default=0.2,
                     help="clipping epsilon for PPO (default: 0.2)")
 parser.add_argument("--recurrence", type=int, default=1,
                     help="number of time-steps gradient is backpropagated (default: 1). If > 1, a LSTM is added to the model to have memory.")
-parser.add_argument("--experience", type=bool, default=False,
-                    help="use experience replay")
+parser.add_argument("--text", action="store_true", default=False,
+                    help="add a GRU to the model to handle text input")
 
 args = parser.parse_args()
 
@@ -112,27 +112,29 @@ txt_logger.info("Training status loaded\n")
 # Load observations preprocessor
 
 obs_space, preprocess_obss = utils.get_obss_preprocessor(envs[0].observation_space)
+if "vocab" in status:
+    preprocess_obss.vocab.load_vocab(status["vocab"])
+txt_logger.info("Observations preprocessor loaded")
 
 # Load model
 
-mousemodel = MouseModel(obs_space, envs[0].action_space, args.mem, args.exp)
+acmodel = ACModel(obs_space, envs[0].action_space, args.mem, args.text)
 if "model_state" in status:
-    mousemodel.load_state_dict(status["model_state"])
-mousemodel.to(device)
+    acmodel.load_state_dict(status["model_state"])
+acmodel.to(device)
 txt_logger.info("Model loaded\n")
-txt_logger.info("{}\n".format(mousemodel))
+txt_logger.info("{}\n".format(acmodel))
 
 # Load algo
 
-if args.algo == "ppo":
-    algo = torch_ac.PPOAlgo(envs, mousemodel, device, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
+if args.algo == "a2c":
+    algo = torch_ac.A2CAlgo(envs, acmodel, device, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
+                            args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
+                            args.optim_alpha, args.optim_eps, preprocess_obss)
+elif args.algo == "ppo":
+    algo = torch_ac.PPOAlgo(envs, acmodel, device, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
                             args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
                             args.optim_eps, args.clip_eps, args.epochs, args.batch_size, preprocess_obss)
-# elif args.algo == "a2c":
-#     algo = torch_ac.A2CAlgo(envs, acmodel, device, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
-#                             args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
-#                             args.optim_alpha, args.optim_eps, preprocess_obss)
-    
 else:
     raise ValueError("Incorrect algorithm name: {}".format(args.algo))
 
@@ -195,7 +197,7 @@ while num_frames < args.frames:
 
     if args.save_interval > 0 and update % args.save_interval == 0:
         status = {"num_frames": num_frames, "update": update,
-                  "model_state": mousemodel.state_dict(), "optimizer_state": algo.optimizer.state_dict()}
+                  "model_state": acmodel.state_dict(), "optimizer_state": algo.optimizer.state_dict()}
         if hasattr(preprocess_obss, "vocab"):
             status["vocab"] = preprocess_obss.vocab.vocab
         utils.save_status(status, model_dir)

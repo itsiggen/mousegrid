@@ -15,6 +15,50 @@ def init_params(m):
             m.bias.data.fill_(0)
 
 
+class MouseModel(nn.Module):
+    def __init__(self, obs_space, action_space, use_memory=False, use_experience=False):
+        super().__init__()
+
+        # Decide which components are enabled
+        self.use_memory = use_memory
+        self.use_experience = use_experience
+
+        n = obs_space["grid"][0]
+        self.input_space = n
+
+        # Define memory
+        if self.use_memory:
+            self.memory_rnn = nn.LSTMCell(self.image_embedding_size, self.semi_memory_size)        
+
+        # Define actor's model
+        self.actor = nn.Sequential(
+            nn.Linear(self.input_space, 64),
+            nn.Tanh(),
+            nn.Linear(64, action_space.n)
+        )
+
+        # Define critic's model
+        self.critic = nn.Sequential(
+            nn.Linear(self.embedding_size, 64),
+            nn.Tanh(),
+            nn.Linear(64, 1)
+        )
+
+        # Initialize parameters correctly
+        self.apply(init_params)
+
+
+    def forward(self, obs, memory):
+
+        x = self.actor(obs)
+        dist = Categorical(logits=F.log_softmax(x, dim=1))
+
+        x = self.critic(obs)
+        value = x.squeeze(1)
+
+        return dist, value, memory
+
+
 class ACModel(nn.Module, torch_ac.RecurrentACModel):
     def __init__(self, obs_space, action_space, use_memory=False, use_text=False):
         super().__init__()
