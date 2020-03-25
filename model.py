@@ -23,7 +23,7 @@ class MouseModel(nn.Module):
         self.use_memory = use_memory
         self.use_experience = use_experience
 
-        n = obs_space["grid"][0]
+        n = obs_space["image"][0]
         self.input_space = n
 
         # Define memory

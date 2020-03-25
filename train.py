@@ -115,7 +115,7 @@ obs_space, preprocess_obss = utils.get_obss_preprocessor(envs[0].observation_spa
 
 # Load model
 
-mousemodel = MouseModel(obs_space, envs[0].action_space, args.mem, args.exp)
+mousemodel = MouseModel(obs_space, envs[0].action_space, args.mem, args.experience)
 if "model_state" in status:
     mousemodel.load_state_dict(status["model_state"])
 mousemodel.to(device)
