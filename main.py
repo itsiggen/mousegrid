@@ -3,17 +3,16 @@ import gym
 import torch
 import numpy as np
 
-
 ############## Hyperparameters ##############
 env_name = "MousePlane-v0"
 render = False
-solved_reward = 300         # stop training if avg_reward > solved_reward
-log_interval = 20           # print avg reward in the interval
-max_episodes = 10000        # max training episodes
-max_timesteps = 100         # max timesteps in one episode
+solved_reward = 0.8         # stop training if avg_reward > solved_reward
+log_interval = 1            # print avg reward in the interval
+max_episodes = 10           # max training episode
+max_timesteps = 20          # max timesteps in one episode
 
-update_timestep = 4000      # update policy every n timesteps
-action_std = 0.5            # constant std for action distribution (Multivariate Normal)
+update_timestep = 20        # update policy every n timesteps
+action_std = 0.2            # constant std for action distribution (Multivariate Normal)
 K_epochs = 80               # update policy for K epochs
 eps_clip = 0.2              # clip parameter for PPO
 gamma = 0.99                # discount factor

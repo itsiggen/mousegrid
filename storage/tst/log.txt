@@ -320,3 +320,13 @@ Environments loaded
 
 Training status loaded
 
+/home/greimas/Git/mousegrid/train.py --algo ppo --env MousePlane-v0 --model tst --save-interval 10 --frames 80000
+
+Namespace(algo='ppo', batch_size=256, clip_eps=0.2, discount=0.99, entropy_coef=0.01, env='MousePlane-v0', epochs=4, experience=False, frames=80000, frames_per_proc=None, gae_lambda=0.95, log_interval=1, lr=0.001, max_grad_norm=0.5, mem=False, model='tst', optim_alpha=0.99, optim_eps=1e-08, procs=1, recurrence=1, save_interval=10, seed=1, value_loss_coef=0.5)
+
+Device: cpu
+
+Environments loaded
+
+Training status loaded
+

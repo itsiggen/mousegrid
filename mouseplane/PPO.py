@@ -32,7 +32,7 @@ class ActorCritic(nn.Module):
                 nn.Linear(64, 32),
                 nn.Tanh(),
                 nn.Linear(32, action_dim),
-                nn.Tanh()
+                nn.Sigmoid()
                 )
         # critic
         self.critic = nn.Sequential(

@@ -8,7 +8,6 @@ from gym.utils import seeding
 import pyautogui as ag
 from gym.envs.registration import register
 import requests
-import time
 
 # Global environment definitions
 
@@ -101,11 +100,7 @@ class MousePlaneEnv(gym.Env):
         obs = self.gen_obs()
         
         if self.goalBox():
-            time.sleep(random.uniform(0.2, 0.6))
-            # ag.click()
-            ag.mouseDown()
-            time.sleep(random.uniform(0.08, 0.12))
-            ag.mouseUp()            
+            ag.click()
             # PAUSE TO
             # button up
             r = requests.get("http://localhost:5000/alterego/result")
@@ -133,8 +128,8 @@ class MousePlaneEnv(gym.Env):
         return point
         
     def goalBox(self):
-        a = self.agent_pos[0] >= self.goal_pos[0]-self.goal_size and self.agent_pos[0] <= self.goal_pos[0]+self.goal_size
-        b = self.agent_pos[1] >= self.goal_pos[1]-self.goal_size and self.agent_pos[1] <= self.goal_pos[1]+self.goal_size
+        a = self.agent_pos[0] >= self.goal_pos[0]-5 and self.agent_pos[0] <= self.goal_pos[0]+5
+        b = self.agent_pos[1] >= self.goal_pos[1]-5 and self.agent_pos[1] <= self.goal_pos[1]+5
         return a and b
         
     
@@ -159,7 +154,7 @@ class MousePlaneEnv(gym.Env):
         # a, b =  viscapture
         # random goal box
         # return [random.randrange(500, 700), random.randrange(500, 700)], 10
-        return [486, 506], 15
+        return [486, 506], 20
     
     def articulatedTrajectory(x, y):
         """
