@@ -73,7 +73,7 @@ def recaptcha2():
         response = json.loads(request.data)
         
         payload = {
-            "secret": "6Lcq_uMUAAAAAPWcwzvFCxJzGpRYPin64qP-Lspq",
+            "secret": "6LfqiagZAAAAAMryPP2u5yQQOAY6MZu8Wbdyc6av",
             "response": response
         }
         
@@ -110,7 +110,7 @@ def recaptcha3():
         response = json.loads(request.data)
         
         payload = {
-            "secret": "6Lf8-OMUAAAAAA4P08KlevkyxtN3HAbHLJNeaRgv",
+            "secret": "6LfqiagZAAAAAMryPP2u5yQQOAY6MZu8Wbdyc6av",
             "response": response
         }
         

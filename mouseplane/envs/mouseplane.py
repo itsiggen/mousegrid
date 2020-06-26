@@ -13,6 +13,7 @@ import time
 # Global environment definitions
 
 FPS = 50
+scores = []
 
 class MousePlaneEnv(gym.Env):
     

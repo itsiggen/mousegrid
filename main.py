@@ -2,16 +2,17 @@ from mouseplane.PPO import PPO, Memory
 import gym
 import torch
 import numpy as np
+import pyautogui as ag
 
 ############## Hyperparameters ##############
-env_name = "MousePlane-v0"
+env_name = "reCaptcha-v0"
 render = False
-solved_reward = 0.8         # stop training if avg_reward > solved_reward
-log_interval = 1            # print avg reward in the interval
-max_episodes = 10           # max training episode
-max_timesteps = 20          # max timesteps in one episode
+solved_reward = 0.5         # stop training if avg_reward > solved_reward
+log_interval = 20           # print avg reward in the interval
+max_episodes = 100          # max training episode
+max_timesteps = 50          # max timesteps in one episode
 
-update_timestep = 20        # update policy every n timesteps
+update_timestep = 40        # update policy every n timesteps
 action_std = 0.2            # constant std for action distribution (Multivariate Normal)
 K_epochs = 80               # update policy for K epochs
 eps_clip = 0.2              # clip parameter for PPO
@@ -24,7 +25,7 @@ random_seed = None
 #############################################
 
 # creating environment
-env = gym.make(env_name)
+env = gym.make(env_name, init_score=0.1)
 state_dim = env.observation_space["image"].shape[0]
 action_dim = env.action_space.shape[0]
 
@@ -42,7 +43,10 @@ print(lr,betas)
 running_reward = 0
 avg_length = 0
 time_step = 0
+scores = []
 
+#move to initial point in screen
+ag.moveTo(990, 260, duration=1, tween=ag.easeOutQuad)  
 # training loop
 for i_episode in range(1, max_episodes+1):
     state = env.reset()
@@ -75,15 +79,17 @@ for i_episode in range(1, max_episodes+1):
         torch.save(ppo.policy.state_dict(), './PPO_continuous_solved_{}.pth'.format(env_name))
         break
     
-    # save every 500 episodes
-    if i_episode % 500 == 0:
+    # save every 20 episodes
+    if i_episode % 20 == 0:
         torch.save(ppo.policy.state_dict(), './PPO_continuous_{}.pth'.format(env_name))
+        scores = env.getScores()
         
     # logging
     if i_episode % log_interval == 0:
         avg_length = int(avg_length/log_interval)
-        running_reward = int((running_reward/log_interval))
+        running_reward = round(running_reward/log_interval, 2)
         
         print('Episode {} \t Avg length: {} \t Avg reward: {}'.format(i_episode, avg_length, running_reward))
         running_reward = 0
         avg_length = 0
+        

@@ -19,11 +19,20 @@
 # #chrome coords 438, 526
 # pyautogui.moveTo(468, 506, duration=0, tween=pyautogui.easeInOutQuad)  # Use tweening/easing function to move mouse over 2 seconds.
 
-import requests
+# import requests
 
-r = requests.get("http://localhost:5000/alterego/result")
-result = r.json()["score"]
-print(result)
+# r = requests.get("http://localhost:5000/alterego/result")
+# result = r.json()["score"]
+# print(result)
+
+# from random import choice, randrange
+
+# a = choice([(1,5),(9,15),(21,27)])
+# b = randrange(*a)
+
+import pyautogui as ag
+
+ag.moveTo(990, 260, duration=0.5, tween=ag.easeOutQuad) 
 
 # from math import sin, cos, radians, pi, atan2, degrees, sqrt
 
